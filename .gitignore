@@ -1,0 +1,8 @@
+**/node_modules
+**/build
+**/yarn-debug.log*
+**/yarn-error.log*
+server/bin
+server/obj
+.vscode/**/*
+database/dbdata/**/*

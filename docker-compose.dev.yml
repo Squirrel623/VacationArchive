@@ -1,0 +1,57 @@
+version: "3"
+services:
+  nginx:
+    container_name: nginx
+    image: nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    expose:
+      - "80"
+    depends_on:
+      - webapi
+      - frontend
+  mysql:
+    container_name: mysql
+    image: "mysql"
+    volumes:
+      - ./database/dbdata:/var/lib/mysql
+      - ./database/init:/docker-entrypoint-initdb.d/:ro
+    environment: 
+      - MYSQL_ROOT_PASSWORD=1234
+    ports:
+      - "3306:3306"
+      - "33060:33060"
+    command: --default-authentication-plugin=mysql_native_password
+  webapi:
+    image: webapi
+    container_name: webapi
+    build:
+      args:
+        buildconfig: Debug
+      context: ./server
+      dockerfile: Dockerfile
+    volumes:
+      - ./server:/app
+      - ./vendor/vsdbg:/publish/vsdbg
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+  frontend:
+    image: frontend
+    container_name: frontend
+    build:
+      context: ./web
+      dockerfile: Dockerfile-dev
+    volumes:
+      - ./web:/app
+    ports:
+      - "3000:3000"
+      - "35729:35729"
+    depends_on:
+      - webapi
