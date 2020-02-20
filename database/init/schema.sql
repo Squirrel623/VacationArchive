@@ -16,7 +16,7 @@ CREATE TABLE vacation
 (
 id INTEGER NOT NULL AUTO_INCREMENT,
 created_by INTEGER NOT NULL,
-start_date DATE,
+start_date DATE NOT NULL,
 end_date DATE,
 
 PRIMARY KEY(id),
@@ -31,8 +31,8 @@ CREATE TABLE vacation_activity
 (
 id INTEGER NOT NULL AUTO_INCREMENT,
 vacation_id INTEGER NOT NULL,
-title TEXT,
-date DATE,
+title TEXT NOT NULL,
+date DATE NOT NULL,
 
 PRIMARY KEY(id),
 FOREIGN KEY(vacation_id)
