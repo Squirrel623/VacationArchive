@@ -14,7 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 using server.Services;
-using server.Controllers.ApiModels;
+using server.Controllers.User.ApiModels;
 
 
 namespace server.Controllers 

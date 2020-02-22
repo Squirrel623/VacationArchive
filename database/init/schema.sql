@@ -4,12 +4,15 @@ USE vacation_archive;
 CREATE TABLE user
 (
 id INTEGER NOT NULL AUTO_INCREMENT,
-name TEXT,
+first_name TEXT NOT NULL,
+last_name TEXT NOT NULL,
+email TEXT NOT NULL,
+
 PRIMARY KEY(id)
 );
 
 INSERT INTO user (id, name) VALUES
-  (1, 'brady');
+  (1, 'brady', 'hutchins', 'squirrel623@yahoo.com');
 
 
 CREATE TABLE vacation
