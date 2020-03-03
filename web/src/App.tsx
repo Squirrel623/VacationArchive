@@ -1,6 +1,6 @@
 import React from 'react';
 import Navbar from 'react-bootstrap/Navbar';
-import {CreateVacation} from './vacation/create';
+import {Home} from './home';
 
 import logo from './logo.svg';
 import './App.css';
@@ -11,7 +11,7 @@ function App() {
       <Navbar>
         <Navbar.Brand>Vacation Archive</Navbar.Brand>
       </Navbar>
-      <CreateVacation/>
+      <Home/>
     </div>
   );
 }

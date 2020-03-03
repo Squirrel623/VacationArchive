@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using server.Services;
 using server.Controllers.Vacation.ApiModels;
 
-
 namespace server.Controllers 
 {
   [ApiController]
@@ -24,10 +23,12 @@ namespace server.Controllers
   public class VacationController : ControllerBase 
   {
     private IUserService _userService;
+    private IVacationService _vacationService;
 
-    public VacationController(IUserService userService)
+    public VacationController(IUserService userService, IVacationService vacationService)
     {
       _userService = userService;
+      _vacationService = vacationService;
     }
 
     [HttpPost]
@@ -35,6 +36,19 @@ namespace server.Controllers
     {
       Console.WriteLine(request.Title);
       return new AddResponse(request.Title);
+    }
+
+    [HttpGet]
+    public ActionResult<GetAllResponse> GetAll()
+    {
+      return new GetAllResponse(vacations: _vacationService.GetAll(userId: 1).Select(modelVacation => new Controllers.Vacation.ApiModels.Vacation {
+          Id = modelVacation.Id,
+          CreatedBy = modelVacation.CreatedBy,
+          Title = modelVacation.Title,
+          StartDate = modelVacation.StartDate,
+          EndDate = modelVacation.EndDate ?? DateTime.Now
+        }) 
+      );
     }
   }
 }

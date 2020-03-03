@@ -1,6 +1,4 @@
-﻿#nullable disable warnings
-
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using server.Models;
@@ -31,7 +29,15 @@ namespace server.Models.Context
         {
             modelBuilder.Entity<User>(entity =>
             {
-                entity.Property(e => e.Name)
+                entity.Property(e => e.Email)
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
+
+                entity.Property(e => e.FirstName)
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
+
+                entity.Property(e => e.LastName)
                     .HasCharSet("utf8mb4")
                     .HasCollation("utf8mb4_0900_ai_ci");
             });
@@ -40,6 +46,10 @@ namespace server.Models.Context
             {
                 entity.HasIndex(e => e.CreatedBy)
                     .HasName("created_by");
+
+                entity.Property(e => e.Title)
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.Vacation)
