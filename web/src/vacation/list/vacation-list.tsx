@@ -10,7 +10,7 @@ interface VacationListProps {
 export const VacationList: FunctionComponent<VacationListProps> = (props: VacationListProps) => {
   const vacationItems = props.vacations.map((vacation) =>
     <ListGroup.Item key={vacation.id}>
-      <VacationItem title={vacation.title} startDate={vacation.startDate} endDate={vacation.endDate}/>
+      <VacationItem title={vacation.title} startDate={vacation.startDate} endDate={vacation.endDate} id={vacation.id}/>
     </ListGroup.Item>
   );
 

@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useHistory} from 'react-router-dom';
 import axios, {AxiosResponse} from 'axios';
 
 import {CreateRequest, CreateResponse} from '../../generated-types/api/vacation/create';
@@ -8,6 +9,7 @@ function CreateVacation() {
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState(todayString);
   const [endDate, setEndDate] = useState(todayString);
+  const history = useHistory();
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     const loginData: CreateRequest = {
@@ -20,8 +22,10 @@ function CreateVacation() {
       try {
         const result = await axios.post<CreateRequest, AxiosResponse<CreateResponse>>('/api/vacations', loginData);
         if (result.status === 201) {
-          console.log(result.data);
-          // Redirect to new vacation
+          setTitle('');
+          setStartDate(todayString);
+          setEndDate(endDate);
+          history.replace(`/vacations/view/${result.data.id}`);
         } else {
           // ???
         }

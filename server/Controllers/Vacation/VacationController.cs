@@ -57,5 +57,18 @@ namespace server.Controllers
         }) 
       );
     }
+
+    [HttpGet("{id}")]
+    public ActionResult<GetResponse> Get(int id)
+    {
+      var vacation = _vacationService.Get(id);
+      if (vacation is null)
+      {
+        return NotFound();
+      }
+
+      return Ok(vacation);
+    }
+
   }
 }

@@ -10,6 +10,7 @@ namespace server.Services
   {
     IEnumerable<Vacation> GetAll(int userId);
     Vacation? Create(int user, string title, DateTime startDate, DateTime endDate);
+    Vacation? Get(int id);
   }
 
   public class VacationService : IVacationService
@@ -23,6 +24,11 @@ namespace server.Services
     public IEnumerable<Vacation> GetAll(int userId)
     {
       return _context.Vacation.Where(vacation => vacation.CreatedBy == userId).AsEnumerable();
+    }
+
+    public Vacation? Get(int id)
+    {
+      return _context.Vacation.FirstOrDefault(vacation => vacation.Id == id);
     }
 
     public Vacation? Create(int user, string title, DateTime startDate, DateTime endDate) 

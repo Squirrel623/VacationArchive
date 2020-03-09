@@ -6,6 +6,7 @@ import {Vacation} from '../../generated-types/api/vacation/vacation';
 import { GetAllResponse } from '../../generated-types/api/vacation/getAll';
 import {VacationList} from './list/vacation-list';
 import {CreateVacation} from './create';
+import {View} from './view';
 
 export const List: FunctionComponent = () => {
   const [vacations, setVacations] = useState<Vacation[]>([]);
@@ -28,15 +29,18 @@ export const List: FunctionComponent = () => {
   return (
     <div>
       <Switch>
+
         <Route exact path={path}>
           <VacationList vacations={vacations}/>
           <Link to={`${url}/create`}>
             <Button>Create</Button>
           </Link>
         </Route>
-        <Route path={`${path}/create`}>
-          <CreateVacation/>
-        </Route>
+
+        <Route path={`${path}/view/:id`} render={(props) => <View id={props.match.params.id}/> }/>
+
+        <Route path={`${path}/create`} component={CreateVacation}/>
+
       </Switch>
     </div>
   );
