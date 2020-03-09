@@ -9,6 +9,7 @@ namespace server.Services
   public interface IVacationService
   {
     IEnumerable<Vacation> GetAll(int userId);
+    Vacation? Create(int user, string title, DateTime startDate, DateTime endDate);
   }
 
   public class VacationService : IVacationService
@@ -22,6 +23,27 @@ namespace server.Services
     public IEnumerable<Vacation> GetAll(int userId)
     {
       return _context.Vacation.Where(vacation => vacation.CreatedBy == userId).AsEnumerable();
+    }
+
+    public Vacation? Create(int user, string title, DateTime startDate, DateTime endDate) 
+    {
+      Vacation newVacation = new Vacation()
+      {
+        Id = default,
+        CreatedBy = user,
+        Title = title,
+        StartDate = startDate,
+        EndDate = endDate
+      };
+
+      try {
+        var result = _context.Vacation.Add(newVacation);
+        result.Context.SaveChanges();
+
+        return result.Entity;
+      } catch {
+        return null;
+      }
     }
   }
 }

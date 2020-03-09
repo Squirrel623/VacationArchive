@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-import axios from 'axios';
+import axios, {AxiosResponse} from 'axios';
 
-import {AddRequest} from '../../generated-types/api/vacation/add';
+import {CreateRequest, CreateResponse} from '../../generated-types/api/vacation/create';
 
 function CreateVacation() {
   const todayString = new Date().toISOString().substring(0, 10);
@@ -10,12 +10,27 @@ function CreateVacation() {
   const [endDate, setEndDate] = useState(todayString);
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
-    const loginData: AddRequest = {
+    const loginData: CreateRequest = {
       title,
       startDate,
       endDate,
     };
-    axios.post('/api/Vacation/Add', loginData);
+
+    const fetch = async () => {
+      try {
+        const result = await axios.post<CreateRequest, AxiosResponse<CreateResponse>>('/api/vacations', loginData);
+        if (result.status === 201) {
+          console.log(result.data);
+          // Redirect to new vacation
+        } else {
+          // ???
+        }
+      } catch (error) {
+
+      }
+    };
+
+    fetch();
     event.preventDefault();
   };
 

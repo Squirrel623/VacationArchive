@@ -1,7 +1,7 @@
 import React, {FunctionComponent} from 'react';
 import {ListGroup} from 'react-bootstrap';
 import {VacationItem} from './vacation-item';
-import { Vacation } from '../../generated-types/api/vacation/getAll';
+import { Vacation } from '../../../generated-types/api/vacation/vacation';
 
 interface VacationListProps {
   vacations: Vacation[];

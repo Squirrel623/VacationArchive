@@ -19,7 +19,7 @@ using server.Controllers.Vacation.ApiModels;
 namespace server.Controllers 
 {
   [ApiController]
-  [Route("[controller]/[action]")]
+  [Route("vacations")]
   public class VacationController : ControllerBase 
   {
     private IUserService _userService;
@@ -32,10 +32,17 @@ namespace server.Controllers
     }
 
     [HttpPost]
-    public ActionResult<AddResponse> Add([FromBody]AddRequest request)
+    public ActionResult<CreateResponse> Create([FromBody]CreateRequest request)
     {
-      Console.WriteLine(request.Title);
-      return new AddResponse(request.Title);
+      //Right now we don't have the user's id from the request. That will be supplied by the JWT
+      //infrastructure. For now just use a hard coded user ID.
+      var vacation = _vacationService.Create(1, request.Title, request.StartDate, request.EndDate);
+      if (vacation is null)
+      {
+        return BadRequest();
+      }
+      
+      return Created($"Vacation/{vacation.Id}", vacation);
     }
 
     [HttpGet]
