@@ -1,26 +1,52 @@
-import React, {FunctionComponent} from 'react';
-import {ListGroup} from 'react-bootstrap';
+import React, {FunctionComponent, useState, useEffect} from 'react';
+import axios from 'axios';
 import {VacationActivity} from '../../../../generated-types/api/vacation/activity/vacationActivity';
-import {ActivityItem} from './item';
+import {GetAllResponse as GetAllActivitiesResponse} from '../../../../generated-types/api/vacation/activity/getAll';
+import {ActivityList as ActivityListBase} from './list';
 
-interface ActivityListProps {
-  activites: VacationActivity[];
+export interface ActivityListProps {
+  vacationId: number;
 }
 
 export const ActivityList: FunctionComponent<ActivityListProps> = (props: ActivityListProps) => {
-  const activityItems = props.activites.map((activity) =>
-    <ListGroup.Item key={activity.id}>
-      <ActivityItem {...activity}/>
-    </ListGroup.Item>
-  );
+  const [activities, setActivities] = useState<VacationActivity[]>();
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setError(false);
+
+      try {
+        const activitiesResult = await axios.get<GetAllActivitiesResponse>(`/api/vacations/${props.vacationId}/activities`);
+        if (activitiesResult.status !== 200) {
+          debugger;
+          setError(true);
+          return;
+        }
+        setActivities(activitiesResult.data.vacationActivities);
+      } catch(error) {
+        setError(true);
+      }
+    };
+
+    fetchData();
+  }, [props.vacationId]);
+
+  if (error) {
+    return (
+      <div>Error</div>
+    );
+  }
+
+  if (!activities) {
+    return (
+      <div>Loading...</div>
+    );
+  }
 
   return (
     <div>
-      <h3>Activities</h3>
-      <ListGroup as="ul">
-        {activityItems}
-      </ListGroup>
+      <ActivityListBase activites={activities}/>
     </div>
-    
   );
 }
