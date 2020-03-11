@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 using server.Services;
 using server.Controllers.Vacation.ApiModels;
+using ApiModels = server.Controllers.Vacation.ApiModels;
+using Activites = server.Controllers.Vacation.ApiModels.Activites;
 
 namespace server.Controllers 
 {
@@ -48,27 +50,37 @@ namespace server.Controllers
     [HttpGet]
     public ActionResult<GetAllResponse> GetAll()
     {
-      return new GetAllResponse(vacations: _vacationService.GetAll(userId: 1).Select(modelVacation => new Controllers.Vacation.ApiModels.Vacation {
-          Id = modelVacation.Id,
-          CreatedBy = modelVacation.CreatedBy,
-          Title = modelVacation.Title,
-          StartDate = modelVacation.StartDate,
-          EndDate = modelVacation.EndDate ?? DateTime.Now
-        }) 
-      );
+      return new GetAllResponse(vacations: _vacationService.GetAll(userId: 1).Select(modelVacation => ApiModels.Vacation.FromModelVacation(modelVacation)));
     }
 
     [HttpGet("{id}")]
     public ActionResult<GetResponse> Get(int id)
     {
-      var vacation = _vacationService.Get(id);
-      if (vacation is null)
+      var modelVacation = _vacationService.Get(id);
+      if (modelVacation is null)
       {
         return NotFound();
       }
 
-      return Ok(vacation);
+      return GetResponse.FromApiModelVacation(ApiModels.Vacation.FromModelVacation(modelVacation));
     }
 
+    [HttpGet("{id}/activities")]
+    public ActionResult<Activites.GetAllResponse> GetAllActivities(int id)
+    {
+      return new Activites.GetAllResponse(vacationActivities: _vacationService.GetAllActivities(id).Select(modelActivity => Activites.VacationActivity.FromModel(modelActivity)));
+    }
+
+    [HttpGet("{vacationId}/activities/{activityId}")]
+    public ActionResult<Activites.GetResponse> GetActivity(int vacationId, int activityId)
+    {
+      var modelActivity = _vacationService.GetActivity(activityId);
+      if (modelActivity is null)
+      {
+        return NotFound();
+      }
+
+      return Activites.GetResponse.FromApiModelActivity(Activites.VacationActivity.FromModel(modelActivity));
+    }
   }
 }

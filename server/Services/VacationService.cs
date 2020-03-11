@@ -11,6 +11,8 @@ namespace server.Services
     IEnumerable<Vacation> GetAll(int userId);
     Vacation? Create(int user, string title, DateTime startDate, DateTime endDate);
     Vacation? Get(int id);
+    IEnumerable<VacationActivity> GetAllActivities(int vacationId);
+    VacationActivity? GetActivity(int activityId);
   }
 
   public class VacationService : IVacationService
@@ -50,6 +52,16 @@ namespace server.Services
       } catch {
         return null;
       }
+    }
+  
+    public IEnumerable<VacationActivity> GetAllActivities(int vacationId)
+    {
+      return _context.VacationActivity.Where(activity => activity.VacationId == vacationId).AsEnumerable();
+    }
+
+    public VacationActivity? GetActivity(int activityId)
+    {
+      return _context.VacationActivity.FirstOrDefault(activity => activity.Id == activityId);
     }
   }
 }
