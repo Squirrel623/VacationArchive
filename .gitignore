@@ -6,3 +6,4 @@ server/bin
 server/obj
 .vscode/**/*
 database/dbdata/**/*
+minio/data/**/*

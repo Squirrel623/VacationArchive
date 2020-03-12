@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 
 using server.Services;
 using server.Controllers.Vacation.ApiModels;
+using server.Storage;
+
 using ApiModels = server.Controllers.Vacation.ApiModels;
 using Activites = server.Controllers.Vacation.ApiModels.Activites;
 
@@ -26,11 +30,13 @@ namespace server.Controllers
   {
     private IUserService _userService;
     private IVacationService _vacationService;
+    private IStorageClient _storageClient;
 
-    public VacationController(IUserService userService, IVacationService vacationService)
+    public VacationController(IUserService userService, IVacationService vacationService, IStorageClient storageClient)
     {
       _userService = userService;
       _vacationService = vacationService;
+      _storageClient = storageClient;
     }
 
     [HttpPost]
@@ -81,6 +87,38 @@ namespace server.Controllers
       }
 
       return Activites.GetResponse.FromApiModelActivity(Activites.VacationActivity.FromModel(modelActivity));
+    }
+  
+    [HttpPost("{vacationId}/activities/{activityId}/media"), DisableRequestSizeLimit]
+    public async Task<ActionResult> SaveMedia()
+    {
+      Console.WriteLine("In Save Media");
+      try
+      {
+        IFormFile file = Request.Form.Files[0];
+        Stream fileStream = file.OpenReadStream();
+        bool saveSuccessful = await _storageClient.StoreBlob(file.Name, fileStream);
+
+        return saveSuccessful ? Ok(file.Name) : StatusCode(500, "Save unsuccessful");
+      }
+      catch(Exception e)
+      {
+        Console.WriteLine(e.ToString());
+        return StatusCode(500, e.ToString());
+      }
+    }
+
+    [HttpGet("{vacationId}/activities/{activityId}/media/{mediaId}")]
+    public async Task<ActionResult> GetMedia(int vacationId, int activityId, int mediaId)
+    {
+      try
+      {
+        return Ok();
+      }
+      catch(Exception e)
+      {
+        return StatusCode(500, e.ToString());
+      }
     }
   }
 }

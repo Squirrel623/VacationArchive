@@ -45,3 +45,17 @@ FOREIGN KEY(vacation_id)
 
 INSERT INTO vacation_activity(vacation_id, title, date) VALUES
   (1, 'My first activity', '2020-01-02');
+
+CREATE TABLE vacation_activity_media
+(
+id INTEGER NOT NULL AUTO_INCREMENT,
+activity_id INTEGER NOT NULL,
+vacation_id INTEGER NOT NULL,
+uri TEXT NOT NULL,
+
+FOREIGN KEY(activity_id)
+  REFERENCES vacation_activity(id),
+FOREIGN KEY(vacation_id)
+  REFERENCES vacation(id),
+PRIMARY KEY(vacation_id, activity_id, id)
+);

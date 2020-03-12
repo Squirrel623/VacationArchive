@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -19,8 +20,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+
 using server.Models.Context;
 using server.Services;
+using server.Storage;
 
 namespace server
 {
@@ -38,6 +41,11 @@ namespace server
         {
             services.Configure<ForwardedHeadersOptions>(options => {
                 options.KnownProxies.Add(System.Net.IPAddress.Parse("0.0.0.0"));
+            });
+            services.Configure<FormOptions>(options => {
+                options.ValueLengthLimit = int.MaxValue;
+                options.MultipartBodyLengthLimit = int.MaxValue;
+                options.MemoryBufferThreshold = int.MaxValue;
             });
 
             services.AddCors(options => {
@@ -74,6 +82,7 @@ namespace server
 
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IVacationService, VacationService>();
+            services.AddSingleton<IStorageClient, StorageClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
