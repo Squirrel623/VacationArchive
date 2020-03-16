@@ -80,9 +80,10 @@ namespace server
                 };
             });
 
+            services.AddSingleton<IStorageClient, StorageClient>();
+            services.AddTransient<IActivityService, ActivityService>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IVacationService, VacationService>();
-            services.AddSingleton<IStorageClient, StorageClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

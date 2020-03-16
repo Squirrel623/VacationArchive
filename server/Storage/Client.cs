@@ -2,13 +2,15 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Minio;
+using Minio.DataModel;
 
 namespace server.Storage
 {
   public interface IStorageClient
   {
-    Task<bool> StoreBlob(string uri, Stream blob);
-    Task<Stream?> GetBlob(string uri);
+    Task<bool> StoreBlob(StorageBlob blob);
+    Task<bool> DeleteBlob(string uri);
+    Task<StorageBlob?> GetBlob(string uri);
   }
 
   public class StorageClient : IStorageClient
@@ -45,7 +47,7 @@ namespace server.Storage
       }
     }
 
-    public async Task<bool> StoreBlob(string uri, Stream blob)
+    public async Task<bool> StoreBlob(StorageBlob blob)
     {
       try
       {
@@ -56,9 +58,10 @@ namespace server.Storage
 
         await minio.PutObjectAsync(
           bucketName: minioBucketName,
-          objectName: uri,
-          data: blob,
-          size: blob.Length // Rethink this? When can this break?
+          objectName: blob.Uri,
+          data: blob.Contents,
+          size: blob.Contents.Length, // Rethink this? When can this break?
+          contentType: blob.ContentType
         );
 
         return true;
@@ -69,7 +72,7 @@ namespace server.Storage
       }
     }
 
-    public async Task<Stream?> GetBlob(string uri)
+    public async Task<StorageBlob?> GetBlob(string uri)
     {
       try
       {
@@ -83,14 +86,27 @@ namespace server.Storage
           stream.CopyTo(ms);
         };
 
-        await minio.StatObjectAsync(bucketName: minioBucketName, objectName: uri);
+        var metadata = await minio.StatObjectAsync(bucketName: minioBucketName, objectName: uri);
         await minio.GetObjectAsync(bucketName: minioBucketName, objectName: uri, cb: streamCallback);
 
-        return ms;
+        return new StorageBlob(uri: uri, contentType: metadata.ContentType, contents: ms);
       }
       catch
       {
         return null;
+      }
+    }
+  
+    public async Task<bool> DeleteBlob(string uri)
+    {
+      try
+      {
+        await minio.RemoveObjectAsync(minioBucketName, uri);
+        return true;
+      }
+      catch
+      {
+        return false;
       }
     }
   }

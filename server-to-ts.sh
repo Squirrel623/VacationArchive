@@ -17,4 +17,5 @@ process_directory() {
 
 process_directory "./server/Controllers/Vacation/ApiModels" "./web/generated-types/api/vacation"
 process_directory "./server/Controllers/Vacation/ApiModels/Activities" "./web/generated-types/api/vacation/activity"
+process_directory "./server/Controllers/Vacation/ApiModels/Activities/Media" "./web/generated-types/api/vacation/activity/media"
 process_directory "./server/Controllers/User/ApiModels" "./web/generated-types/api/user"

@@ -7,7 +7,6 @@ namespace server.Models.Context
 {
     public partial class AppDbContext : DbContext
     {
-
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
@@ -16,6 +15,7 @@ namespace server.Models.Context
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<Vacation> Vacation { get; set; }
         public virtual DbSet<VacationActivity> VacationActivity { get; set; }
+        public virtual DbSet<VacationActivityMedia> VacationActivityMedia { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -73,6 +73,35 @@ namespace server.Models.Context
                     .HasForeignKey(d => d.VacationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("vacation_activity_ibfk_1");
+            });
+
+            modelBuilder.Entity<VacationActivityMedia>(entity =>
+            {
+                entity.HasIndex(e => e.ActivityId)
+                    .HasName("activity_id");
+
+                entity.HasIndex(e => e.VacationId)
+                    .HasName("vacation_id");
+
+                entity.Property(e => e.ContentType)
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
+
+                entity.Property(e => e.Uri)
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
+
+                entity.HasOne(d => d.Activity)
+                    .WithMany(p => p.VacationActivityMedia)
+                    .HasForeignKey(d => d.ActivityId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("vacation_activity_media_ibfk_1");
+
+                entity.HasOne(d => d.Vacation)
+                    .WithMany(p => p.VacationActivityMedia)
+                    .HasForeignKey(d => d.VacationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("vacation_activity_media_ibfk_2");
             });
 
             OnModelCreatingPartial(modelBuilder);

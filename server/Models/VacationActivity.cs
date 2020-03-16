@@ -8,6 +8,11 @@ namespace server.Models
     [Table("vacation_activity")]
     public partial class VacationActivity
     {
+        public VacationActivity()
+        {
+            VacationActivityMedia = new HashSet<VacationActivityMedia>();
+        }
+
         [Key]
         [Column("id")]
         public int Id { get; set; }
@@ -22,5 +27,7 @@ namespace server.Models
         [ForeignKey(nameof(VacationId))]
         [InverseProperty("VacationActivity")]
         public virtual Vacation Vacation { get; set; }
+        [InverseProperty("Activity")]
+        public virtual ICollection<VacationActivityMedia> VacationActivityMedia { get; set; }
     }
 }

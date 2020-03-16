@@ -52,10 +52,11 @@ id INTEGER NOT NULL AUTO_INCREMENT,
 activity_id INTEGER NOT NULL,
 vacation_id INTEGER NOT NULL,
 uri TEXT NOT NULL,
+content_type TEXT NOT NULL,
 
+PRIMARY KEY(id),
 FOREIGN KEY(activity_id)
   REFERENCES vacation_activity(id),
 FOREIGN KEY(vacation_id)
-  REFERENCES vacation(id),
-PRIMARY KEY(vacation_id, activity_id, id)
+  REFERENCES vacation(id)
 );

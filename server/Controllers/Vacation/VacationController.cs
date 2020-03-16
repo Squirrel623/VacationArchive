@@ -21,6 +21,7 @@ using server.Storage;
 
 using ApiModels = server.Controllers.Vacation.ApiModels;
 using Activites = server.Controllers.Vacation.ApiModels.Activites;
+using ActivityMedia = server.Controllers.Vacation.ApiModels.Activites.Media;
 
 namespace server.Controllers 
 {
@@ -30,13 +31,13 @@ namespace server.Controllers
   {
     private IUserService _userService;
     private IVacationService _vacationService;
-    private IStorageClient _storageClient;
+    private IActivityService _activityService;
 
-    public VacationController(IUserService userService, IVacationService vacationService, IStorageClient storageClient)
+    public VacationController(IUserService userService, IVacationService vacationService, IActivityService activityService)
     {
       _userService = userService;
       _vacationService = vacationService;
-      _storageClient = storageClient;
+      _activityService = activityService;
     }
 
     [HttpPost]
@@ -88,18 +89,49 @@ namespace server.Controllers
 
       return Activites.GetResponse.FromApiModelActivity(Activites.VacationActivity.FromModel(modelActivity));
     }
+
+    [HttpGet("{vacationId}/activities/{activityId}/media")]
+    public async Task<ActionResult<ActivityMedia.GetAllResponse>> GetAllActivityMedia(int vacationId, int activityId)
+    {
+      try
+      {
+        var result = await _activityService.GetAllActivityMedia(vacationId: vacationId, activityId: activityId);
+
+        if (result is null)
+        {
+          return NotFound();
+        }
+
+        return Ok(new ActivityMedia.GetAllResponse() {
+          Items = result.Select((mediaRecord) => ActivityMedia.VacationActivityMedia.FromModel(mediaRecord))
+        });
+      }
+      catch(Exception e)
+      {
+        return StatusCode(500, e.ToString());
+      }
+    }
   
     [HttpPost("{vacationId}/activities/{activityId}/media"), DisableRequestSizeLimit]
-    public async Task<ActionResult> SaveMedia()
+    public async Task<ActionResult<ActivityMedia.CreateResponse>> SaveMedia(int vacationId, int activityId)
     {
       Console.WriteLine("In Save Media");
       try
       {
         IFormFile file = Request.Form.Files[0];
         Stream fileStream = file.OpenReadStream();
-        bool saveSuccessful = await _storageClient.StoreBlob(file.Name, fileStream);
 
-        return saveSuccessful ? Ok(file.Name) : StatusCode(500, "Save unsuccessful");
+        Models.VacationActivityMedia? savedMediaRecord = await _activityService.SaveMediaContents(
+          vacationId: vacationId,
+          activityId: activityId,
+          contents: fileStream,
+          name: file.FileName,
+          contentType: file.ContentType
+        );
+
+        return savedMediaRecord is null ? 
+          StatusCode(500, "Save unsuccessful") :
+          Ok(ActivityMedia.CreateResponse.FromModel(savedMediaRecord));
       }
       catch(Exception e)
       {
@@ -109,11 +141,48 @@ namespace server.Controllers
     }
 
     [HttpGet("{vacationId}/activities/{activityId}/media/{mediaId}")]
-    public async Task<ActionResult> GetMedia(int vacationId, int activityId, int mediaId)
+    public async Task<ActionResult<ActivityMedia.GetResponse>> GetMedia(int vacationId, int activityId, int mediaId)
+    {
+      
+      try
+      {
+        var result = await _activityService.GetMedia(
+          vacationId: vacationId,
+          activityId: activityId,
+          mediaId: mediaId
+        );
+
+        if (result is null)
+        {
+          return NotFound();
+        }
+
+        return Ok(ActivityMedia.VacationActivityMedia.FromModel(result));
+      }
+      catch(Exception e)
+      {
+        return StatusCode(500, e.ToString());
+      }
+    }
+
+    [HttpGet("{vacationId}/activities/{activityId}/media/{mediaId}/contents")]
+    public async Task<ActionResult> GetMediaContents(int vacationId, int activityId, int mediaId)
     {
       try
       {
-        return Ok();
+        var result = await _activityService.GetMediaContents(
+          vacationId: vacationId,
+          activityId: activityId,
+          mediaId: mediaId
+        );
+
+        if (result is null)
+        {
+          return NotFound();
+        }
+
+        result.Contents.Seek(0, SeekOrigin.Begin);
+        return new FileStreamResult(result.Contents, result.ContentType);
       }
       catch(Exception e)
       {

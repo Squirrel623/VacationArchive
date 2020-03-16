@@ -1,10 +1,14 @@
 import React, {FunctionComponent, useState} from 'react';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import {Form, Button} from 'react-bootstrap';
+
+import {CreateResponse} from '../../../../generated-types/api/vacation/activity/media/create';
+import { VacationActivityMedia } from '../../../../generated-types/api/vacation/activity/media/vacationActivityMedia';
 
 export interface ActivityMediaUploaderProps {
   vacationId: number;
   activityId: number;
+  onComplete?: (newMedia: VacationActivityMedia) => void;
 }
 
 export const ActivityMediaUploader: FunctionComponent<ActivityMediaUploaderProps> = (props) => {
@@ -32,8 +36,13 @@ export const ActivityMediaUploader: FunctionComponent<ActivityMediaUploaderProps
 
     const uploadData = async () => {
       try {
-        const result = await axios.post(url, formData);
-        debugger;
+        const result = await axios.post<any, AxiosResponse<CreateResponse>>(url, formData);
+        console.log(result.data);
+
+        if (props.onComplete) {
+          props.onComplete(result.data);
+        }
+        //debugger;
       } catch(error) {
         console.log(error);
         debugger;

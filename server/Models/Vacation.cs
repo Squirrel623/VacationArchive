@@ -11,6 +11,7 @@ namespace server.Models
         public Vacation()
         {
             VacationActivity = new HashSet<VacationActivity>();
+            VacationActivityMedia = new HashSet<VacationActivityMedia>();
         }
 
         [Key]
@@ -31,5 +32,7 @@ namespace server.Models
         public virtual User CreatedByNavigation { get; set; }
         [InverseProperty("Vacation")]
         public virtual ICollection<VacationActivity> VacationActivity { get; set; }
+        [InverseProperty("Vacation")]
+        public virtual ICollection<VacationActivityMedia> VacationActivityMedia { get; set; }
     }
 }
