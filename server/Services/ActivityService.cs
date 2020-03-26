@@ -17,6 +17,7 @@ namespace server.Services
   {
     Task<IEnumerable<VacationActivityMedia>?> GetAllActivityMedia(int vacationId, int activityId);
     Task<VacationActivityMedia?> GetMedia(int vacationId, int activityId, int mediaId);
+    Task<bool> DeleteMedia(int vacationId, int activityId, int mediaId);
 
     Task<StorageBlob?> GetMediaContents(int vacationId, int activityId, int mediaId);
     Task<VacationActivityMedia?> SaveMediaContents(int vacationId, int activityId, Stream contents, string name, string contentType);
@@ -97,7 +98,7 @@ namespace server.Services
       }
       catch(Exception e)
       {
-        _logger.LogError(e, $"General exception cought when getting media contents for mediaId: ${mediaId}");
+        _logger.LogError(e, $"General exception caught when getting media contents for mediaId: ${mediaId}");
         return null;
       }
       
@@ -118,8 +119,30 @@ namespace server.Services
       }
       catch(Exception e)
       {
-        _logger.LogError(e, $"General exception cought when getting media record for mediaId: ${mediaId}");
+        _logger.LogError(e, $"General exception caught when getting media record for mediaId: ${mediaId}");
         return null;
+      }
+    }
+
+    public async Task<bool> DeleteMedia(int vacationId, int activityId, int mediaId)
+    {
+      try
+      {
+        var mediaRecordToDelete = await _context.VacationActivityMedia.SingleOrDefaultAsync((mediaRecord) => mediaRecord.Id == mediaId);
+        if (mediaRecordToDelete is null)
+        {
+          return false;
+        }
+
+        _context.Remove(mediaRecordToDelete);
+        await _context.SaveChangesAsync();
+
+        return await _storageClient.DeleteBlob(mediaRecordToDelete.Uri);
+      }
+      catch(Exception e)
+      {
+        _logger.LogError(e, $"Exception caught when deleting media with ID: ${mediaId}");
+        return false;
       }
     }
 

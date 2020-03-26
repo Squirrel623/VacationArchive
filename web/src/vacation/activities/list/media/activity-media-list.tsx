@@ -47,7 +47,7 @@ export const ActivityMediaList: FunctionComponent<ActivityMediaListProps> = (pro
   }
 
   const mediaItems = mediaList.map((mediaRecord) => 
-    <ListGroup.Item key={props.activityId}>
+    <ListGroup.Item key={mediaRecord.activityId.toString() + ' ' + mediaRecord.id.toString()}>
       <ActivityMediaItem id={mediaRecord.id} activityId={mediaRecord.activityId} vacationId={mediaRecord.vacationId} contentType={mediaRecord.contentType}/>
     </ListGroup.Item>
   );

@@ -182,12 +182,20 @@ namespace server.Controllers
         }
 
         result.Contents.Seek(0, SeekOrigin.Begin);
-        return new FileStreamResult(result.Contents, result.ContentType);
+        return File(result.Contents, result.ContentType, enableRangeProcessing: true);
       }
       catch(Exception e)
       {
         return StatusCode(500, e.ToString());
       }
+    }
+
+    [HttpDelete("{vacationId}/activities/{activityId}/media/{mediaId}")]
+    public async Task<ActionResult> DeleteMedia(int vacationId, int activityId, int mediaId)
+    {
+      bool deleteSuccessful = await _activityService.DeleteMedia(vacationId, activityId, mediaId);
+
+      return deleteSuccessful ? NoContent() : StatusCode(500);
     }
   }
 }

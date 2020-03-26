@@ -11,24 +11,6 @@ export interface ActivityMediaItemProps {
 }
 
 export const ActivityMediaItem: FunctionComponent<ActivityMediaItemProps> = (props: ActivityMediaItemProps) => {
-  /* const [url, setUrl] = useState<string>();
-  const [contentType, setContentType] = useState<string>();
-
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const mediaRecord = await axios.get<any, AxiosResponse<GetResponse>>(`/api/vacations/${props.vacationId}/activities/${props.activityId}/media/${props.id}`);
-        setContentType(mediaRecord.data.contentType);
-        setUrl(`/api/vacations/${props.vacationId}/activities/${props.activityId}/media/${props.id}/contents`);
-      } catch {
-        setContentType(undefined);
-        setUrl(undefined);
-      }
-    };
-
-    fetch();
-  }, [props.vacationId, props.activityId, props.id]); */
-
   function getContentWrapper() {
     const url = `/api/vacations/${props.vacationId}/activities/${props.activityId}/media/${props.id}/contents`;
 
@@ -38,7 +20,10 @@ export const ActivityMediaItem: FunctionComponent<ActivityMediaItemProps> = (pro
       );
     } else {
       return (
-        <video src={url}></video>
+        <video preload="metadata" height="auto" width="100%" controls>
+          <source src={url} type={props.contentType}/>
+          <p>Your browser does not support videos with content type "{props.contentType}"</p>
+        </video>
       );
     }
   }
