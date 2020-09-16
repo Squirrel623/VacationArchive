@@ -13,6 +13,8 @@ services:
     depends_on:
       - webapi
       - frontend
+      - mysql
+      - minio
   mysql:
     container_name: mysql
     image: "mysql"
@@ -42,6 +44,7 @@ services:
       - "8080:80"
     depends_on:
       - mysql
+      - minio
   frontend:
     image: frontend
     container_name: frontend

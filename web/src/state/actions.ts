@@ -41,6 +41,7 @@ export function fetchVacations(): ThunkResult<Promise<void>> {
   return (dispatch) => {
     dispatch(requestVacations());
     return axios.get<GetAllVacationsResponse>('/api/vacations')
+      // TODO: Handle error case
       .then((response) => {
         dispatch(receiveVacations(response.data.vacations));
       });
@@ -66,6 +67,7 @@ export function fetchActivities(vacationId: number): ThunkResult<Promise<void>> 
   return (dispatch) => {
     dispatch(requestActivities(vacationId));
     return axios.get<GetAllActivitiesResponse>(`/api/vacations/${vacationId}/activities`)
+      // TODO: handle error case
       .then((response) => {
         dispatch(receiveActivities(vacationId, response.data.vacationActivities));
       });
